@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>perturber</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+<header>
+  <button id="theme-toggle" title="Toggle light/dark theme">🌙 Dark</button>
+  <h1>perturber</h1>
+  <p>Semantics-preserving text perturbations. One perturbation per call; compose by chaining.</p>
+  <div class="links">
+    <a href="/docs">API docs</a><span>·</span>
+    <a href="/perturbations">catalog</a><span>·</span>
+    <a href="/health">health</a><span>·</span>
+    <span id="version" title="Deployed service version"></span>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <label for="perturbation">Perturbation</label>
+    <select id="perturbation"></select>
+    <div class="desc" id="desc"></div>
+
+    <!-- Shown only for model-backed perturbations. The key is sent as the Authorization: Bearer
+         header, the optional base URL as X-LLM-Base-URL. Both are saved locally and never included
+         in the shareable URL. -->
+    <div id="llm-row" style="display:none">
+      <hr class="divider" />
+      <label for="llm-key">API key</label>
+      <input id="llm-key" type="password" autocomplete="off" placeholder="OpenAI-compatible API key" />
+      <label for="llm-base-url">Base URL <span class="muted">(optional)</span></label>
+      <input id="llm-base-url" type="text" autocomplete="off"
+             placeholder="https://api.openai.com/v1" />
+    </div>
+
+    <div id="params"></div>
+
+    <div id="seed-block">
+      <label for="seed">Seed</label>
+      <div class="seed-row">
+        <input id="seed" type="number" value="0" />
+        <button id="randomize" class="secondary" title="Generate a new random seed now">Randomize</button>
+        <label class="checkbox" title="Generate a new random seed on every Perturb">
+          <input id="autorandom" type="checkbox" checked /> Auto-randomize
+        </label>
+      </div>
+      <div class="seed-note" id="seed-note"></div>
+    </div>
+
+    <!-- System-prompt expander for model-backed perturbations (populated in onSelect). -->
+    <div id="prompt-block"></div>
+
+    <label for="texts">Text (one per line, each line is perturbed independently)</label>
+    <textarea id="texts">According to all known laws of aviation, there is no way that a bee should be able to fly. Its wings are too small to get its fat little body off the ground.</textarea>
+
+    <hr class="divider" />
+    <div class="btn-row">
+      <button id="run">Perturb</button>
+      <button id="share" class="secondary" title="Copy a link that reproduces this perturb instance">Share</button>
+      <button id="reset" class="secondary" title="Reset the form, history, and saved state to defaults">Reset</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="hist-head">
+      <label style="margin:0">Result</label>
+      <button id="copy" class="linkbtn" title="Copy the result to the clipboard" disabled>Copy</button>
+    </div>
+    <div class="out" id="output">Pick a perturbation and press Perturb.</div>
+    <div class="meta" id="meta"></div>
+
+    <div class="hist-head">
+      <label style="margin:16px 0 0">History <span id="hist-hint" style="color:var(--border)"></span></label>
+      <button id="clear" class="linkbtn" title="Remove all runs from history">Clear</button>
+    </div>
+    <div id="history" class="history"></div>
+  </section>
+</main>
+
+<footer>
+  Model-backed perturbations call the OpenAI-compatible endpoint you configure; the API key you
+  enter is sent per request and never stored by the service.
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

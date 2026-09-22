@@ -1,84 +1,99 @@
-## Contributing In General
-Our project welcomes external contributions. If you have an itch, please feel
-free to scratch it.
+# Contributing
 
-To contribute code or documentation, please submit a **FIXME** [pull request](https://github.com/ibm/repo-template/pulls).
+Thank you for your interest in perturber. This project is maintained by a small team, and we
+keep the contribution process deliberately light.
 
-A good way to familiarize yourself with the codebase and contribution process is
-to look for and tackle low-hanging fruit in the **FIXME** [issue tracker](https://github.com/ibm/repo-template/issues).
-Before embarking on a more ambitious contribution, please quickly [get in touch](#communication) with us.
+## Scope
 
-**Note: We appreciate your effort, and want to avoid a situation where a contribution
-requires extensive rework (by you or by us), sits in backlog for a long time, or
-cannot be accepted at all!**
+We are not accepting unsolicited feature contributions at this time. The project has a focused
+design (one primitive: apply one named perturbation to one string, under a seed), and we prefer
+to keep its surface small. If you would like to propose a change, please open an issue first to
+discuss it before writing any code, so we can tell you whether it fits the roadmap.
 
-### Proposing new features
+We do welcome:
 
-If you would like to implement a new feature, please **FIXME** [raise an issue](https://github.com/ibm/repo-template/issues)
-before sending a pull request so the feature can be discussed. This is to avoid
-you wasting your valuable time working on a feature that the project developers
-are not interested in accepting into the code base.
+- **Bug reports**, with a minimal reproduction (the input string, perturbation name, params, and
+  seed, plus the expected and actual output).
+- **Documentation fixes**.
 
-### Fixing bugs
+## Reporting a bug
 
-If you would like to fix a bug, please **FIXME** [raise an issue](https://github.com/ibm/repo-template/issues) before sending a
-pull request so it can be tracked.
+Open an issue describing the problem. For a perturbation that produces the wrong output, include
+the exact `perturb(...)` call or `curl` request and its output, so we can reproduce it
+deterministically.
+
+## Proposing a change
+
+Please raise an issue before sending a pull request, whether it is a new feature or a bug fix, so
+the change can be discussed and tracked. We appreciate your effort and want to avoid a situation
+where a contribution needs extensive rework, sits in the backlog, or cannot be accepted at all.
+
+## Setup
+
+```bash
+pip install -e '.[dev,llm]'
+```
+
+The native `synonym` perturbation needs the WordNet corpus and the perceptron POS tagger; both
+download automatically on first use.
+
+## Testing and style
+
+Run the linter before opening a pull request:
+
+```bash
+ruff check perturber
+```
+
+Match the style of the surrounding code: keep changes small and focused, and follow the existing
+naming and comment conventions rather than introducing new ones.
+
+Perturbations are expected to be deterministic for a fixed `(text, name, params, seed)`. If you
+change one, confirm that the same inputs still produce the same output. The model-backed
+perturbations are the exception and are not reproducible.
+
+## Submitting a change
+
+1. Fork the repository and create a branch from `main`.
+2. Sign off your commits (see [Legal](#legal) below).
+3. Run the linter.
+4. Open the pull request against `main` and describe what changed and why.
 
 ### Merge approval
 
-The project maintainers use LGTM (Looks Good To Me) in comments on the code
-review to indicate acceptance. A change requires LGTMs from two of the
-maintainers of each component affected.
-
-For a list of the maintainers, see the [MAINTAINERS.md](MAINTAINERS.md) page.
+The maintainers use LGTM (Looks Good To Me) in review comments to indicate acceptance. A change
+needs an LGTM from a maintainer of each affected component before it is merged.
 
 ## Legal
 
-Each source file must include a license header for the Apache
-Software License 2.0. Using the SPDX format is the simplest approach.
-e.g.
+Each source file must include a license header for the Apache Software License 2.0. Using the
+SPDX format is the simplest approach, e.g.
 
 ```
-/*
-Copyright <holder> All Rights Reserved.
-
-SPDX-License-Identifier: Apache-2.0
-*/
+# Copyright <holder> All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
 ```
 
-We have tried to make it as easy as possible to make contributions. This
-applies to how we handle the legal aspects of contribution. We use the
-same approach - the [Developer's Certificate of Origin 1.1 (DCO)](https://github.com/hyperledger/fabric/blob/master/docs/source/DCO1.1.txt) - that the Linux® Kernel [community](https://elinux.org/Developer_Certificate_Of_Origin)
-uses to manage code contributions.
+We use the [Developer's Certificate of Origin 1.1 (DCO)](https://developercertificate.org/) — the
+same approach the Linux® Kernel
+[community](https://elinux.org/Developer_Certificate_Of_Origin) uses — to manage code
+contributions. By signing off on your commits you certify that you wrote the change, or otherwise
+have the right to submit it under the project's license.
 
-We simply ask that when submitting a patch for review, the developer
-must include a sign-off statement in the commit message.
-
-Here is an example Signed-off-by line, which indicates that the
-submitter accepts the DCO:
+When submitting a patch for review, include a sign-off statement in the commit message:
 
 ```
 Signed-off-by: John Doe <john.doe@example.com>
 ```
 
-You can include this automatically when you commit a change to your
-local git repository using the following command:
+Git adds this trailer for you if you commit with `-s`:
 
+```bash
+git commit -s -m "your message"
 ```
-git commit -s
-```
 
-## Communication
-**FIXME** Please feel free to connect with us on our [Slack channel](link).
+Pull requests without a sign-off will fail the DCO check.
 
-## Setup
-**FIXME** Please add any special setup instructions for your project to help the developer
-become productive quickly.
-
-## Testing
-**FIXME** Please provide information that helps the developer test any changes they make
-before submitting.
-
-## Coding style guidelines
-**FIXME** Optional, but recommended: please share any specific style guidelines you might
-have for your project.
+By contributing, you agree that your contributions are licensed under the project's
+[Apache-2.0](LICENSE) license.

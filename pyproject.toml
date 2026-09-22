@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "perturber"
+description = "A stateless service and library that applies semantics-preserving perturbations to text."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Khoi-Nguyen Tran", email = "kndtran@ibm.com" }]
+dynamic = ["version"]
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "nltk>=3.8",  # native `synonym` perturbation (WordNet); ships in every image
+]
+
+[project.optional-dependencies]
+# The model-backed perturbations (paraphrasing, emotion_prompt, ...) call any OpenAI-compatible
+# /chat/completions endpoint through the `openai` client. The API key is supplied per request
+# (Authorization: Bearer, or the OPENAI_API_KEY env var); the base URL is configured per request
+# (X-LLM-Base-URL) or via OPENAI_BASE_URL.
+llm = [
+    "openai>=1.0",
+]
+dev = [
+    "ruff>=0.4",
+]
+
+[project.scripts]
+perturber = "perturber.cli:main"
+perturber-serve = "perturber.cli:serve_main"
+
+[tool.setuptools]
+packages = ["perturber", "perturber.perturbations"]
+
+[tool.setuptools.package-data]
+perturber = ["static/*"]
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"

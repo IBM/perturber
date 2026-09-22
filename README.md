@@ -1,78 +1,166 @@
-<!-- This should be the location of the title of the repository, normally the short name -->
-# repo-template
+# perturber
 
-<!-- Build Status, is a great thing to have at the top of your repository, it shows that you take your CI/CD as first class citizens -->
-<!-- [![Build Status](https://travis-ci.org/jjasghar/ibm-cloud-cli.svg?branch=master)](https://travis-ci.org/jjasghar/ibm-cloud-cli) -->
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-<!-- Not always needed, but a scope helps the user understand in a short sentance like below, why this repo exists -->
-## Scope
+A small, stateless service and library that applies semantics-preserving perturbations to
+text. The caller sends a string, a perturbation name, its parameters, and a seed; the service
+returns the perturbed string. Everything downstream, which model consumes the string, how it
+is evaluated, is the caller's responsibility. `perturber` only transforms text.
 
-The purpose of this project is to provide a template for new open source repositories.
+The service has exactly one primitive: **apply one named perturbation to one string, under a
+seed.** There is no stack grammar; to apply several perturbations in sequence, chain the calls.
 
-<!-- A more detailed Usage or detailed explaination of the repository here -->
-## Usage
+All perturbations are permissively licensed, first-party implementations. Most are deterministic
+string transforms with no model dependency; the model-backed ones call any OpenAI-compatible
+`/chat/completions` endpoint you configure per request.
 
-This repository contains some example best practices for open source repositories:
+## Citation
 
-* [LICENSE](LICENSE)
-* [README.md](README.md)
-* [CONTRIBUTING.md](CONTRIBUTING.md)
-* [MAINTAINERS.md](MAINTAINERS.md)
-* [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
-<!-- A Changelog allows you to track major changes and things that happen, https://github.com/github-changelog-generator/github-changelog-generator can help automate the process -->
-* [CHANGELOG.md](CHANGELOG.md)
+If you use `perturber` in your work, please cite it:
 
-> These are optional
+```bibtex
+@software{tran2026perturber,
+  title   = {perturber: A Stateless Service for Semantics-Preserving Text Perturbations},
+  author  = {Tran, Khoi-Nguyen},
+  year    = {2026},
+  version = {1.0.0},
+  url     = {https://github.com/IBM/perturber},
+  license = {Apache-2.0}
+}
+```
 
-<!-- The following are OPTIONAL, but strongly suggested to have in your repository. -->
-* [dco.yml](.github/dco.yml) - This enables DCO bot for you, please take a look https://github.com/probot/dco for more details.
-* [travis.yml](.travis.yml) - This is a example `.travis.yml`, please take a look https://docs.travis-ci.com/user/tutorial/ for more details.
+## Example
 
-These may be copied into a new or existing project to make it easier for developers not on a project team to collaborate.
+```python
+from perturber import perturb
 
-<!-- A notes section is useful for anything that isn't covered in the Usage or Scope. Like what we have below. -->
-## Notes
+perturb("hello world", "title_case", seed=0)
+# -> 'Hello World'
 
-**NOTE: While this boilerplate project uses the Apache 2.0 license, when
-establishing a new repo using this template, please use the
-license that was approved for your project.**
+perturb("hello world", "word_merge", seed=0)
+# -> 'helloworld'
+```
 
-**NOTE: This repository has been configured with the [DCO bot](https://github.com/probot/dco).
-When you set up a new repository that uses the Apache license, you should
-use the DCO to manage contributions. The DCO bot will help enforce that.
-Please contact one of the IBM GH Org stewards.**
+Composition is the caller chaining calls, so it is order-dependent:
 
-<!-- Questions can be useful but optional, this gives you a place to say, "This is how to contact this project maintainers or create PRs -->
-If you have any questions or issues you can create a new [issue here][issues].
+```python
+text = perturb("hello world", "title_case", seed=0)
+text = perturb(text, "word_merge", seed=0)        # -> 'HelloWorld'
 
-Pull requests are very welcome! Make sure your patches are well tested.
-Ideally create a topic branch for every separate change you make. For
-example:
+text = perturb("hello world", "word_merge", seed=0)
+text = perturb(text, "title_case", seed=0)        # -> 'Helloworld'
+```
 
-1. Fork the repo
-2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Added some feature'`)
-4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+For a fixed `(text, name, params, seed)`, a deterministic perturbation always returns the same
+string, so both chains above are reproducible. The library and the `POST /perturb` route produce
+byte-for-byte identical output, so a chain gives the same result whichever interface runs it.
+
+## Install
+
+```bash
+pip install .            # library + CLI + service (core perturbations)
+pip install '.[llm]'     # also enable the model-backed perturbations (adds the openai client)
+pip install '.[dev]'     # lint tooling
+```
+
+The native `synonym` perturbation uses WordNet and the perceptron POS tagger; both auto-download
+on first use if they are not already present.
+
+## Library
+
+```python
+from perturber import perturb, list_perturbations
+
+perturb("The quick brown fox.", "realistic_typos", seed=0)
+perturb('{"type":"object"}', "reorder_properties", category="native", seed=0)
+
+# Discover what is available.
+for entry in list_perturbations():
+    print(entry["category"], entry["name"], entry["family"], entry["in_scope"])
+```
+
+`perturb` is a pure function of `(text, name, params, seed)` for the deterministic perturbations.
+The model-backed perturbations are best-effort and non-deterministic.
+
+## Service
+
+```bash
+perturber-serve                      # or: uvicorn perturber.api:app --port 8080
+```
+
+Every perturbation gets its own typed route, grouped by family in the OpenAPI docs
+(`/docs`). An interactive playground is served at `/`.
+
+- `POST /perturb/native/{name}`  apply a perturbation to a list of texts
+- `GET  /perturbations[/native]` the catalog (family, params, `in_scope`, seed-sensitivity)
+- `GET  /health`, `GET /version`
+
+```bash
+curl -s localhost:8080/perturb/native/realistic_typos \
+  -H 'content-type: application/json' \
+  -d '{"texts":["The quick brown fox."],"seed":0}'
+```
+
+## CLI
+
+```bash
+perturber realistic_typos --text "The quick brown fox." --seed 0
+echo "The quick brown fox." | perturber random_case
+perturber list
+```
+
+Output is written to stdout verbatim (no trailing newline) so round-trips are exact.
+
+## Model-backed perturbations
+
+Some perturbations (the `paraphrasing` family, `emotion_prompt`, and the `reasoning` probes)
+call a language model through any OpenAI-compatible `/chat/completions` API. They carry no
+secret in the service; credentials and the endpoint are supplied per request.
+
+- **API key** (required): sent as the `Authorization: Bearer <key>` request header (the
+  `X-LLM-API-Key` header is also accepted). The CLI and library fall back to the
+  `OPENAI_API_KEY` environment variable. The key never enters the request body, the echoed
+  `params`, or the response.
+- **Base URL** (optional): sent as the `X-LLM-Base-URL` request header, used verbatim. When
+  absent it falls back to `OPENAI_BASE_URL` (default `https://api.openai.com/v1`).
+- **Model**: the `model` parameter selects the model per request. Its dropdown choices come
+  from a static list, configurable via the `PERTURBER_LLM_MODELS` environment variable
+  (comma-separated; the first entry is the default). Any model id the endpoint serves may be
+  supplied.
+
+```bash
+curl -s localhost:8080/perturb/native/lexical_paraphrasing \
+  -H 'content-type: application/json' \
+  -H 'Authorization: Bearer YOUR_KEY' \
+  -H 'X-LLM-Base-URL: https://api.openai.com/v1' \
+  -d '{"texts":["The mitochondrion produces most of the cell's energy."],"model":"gpt-4o-mini"}'
+```
+
+## The `in_scope` flag
+
+Each perturbation declares whether it is a natural, semantics-preserving surface transformation
+(`in_scope=True`) or falls outside that definition (`in_scope=False`, for example the
+prompt-injection probes and the content-adding reasoning probes). All perturbations stay
+callable; the playground hides the out-of-scope ones from its dropdown, and a benchmark harness
+can filter on the flag. The registry is the single source of truth; the flag is exposed in the
+catalog.
+
+## Docker
+
+```bash
+docker build -t perturber .
+docker run -p 8080:8080 perturber
+# model-backed perturbations: pass credentials per request, or bake defaults into the env:
+docker run -p 8080:8080 -e OPENAI_API_KEY=... -e OPENAI_BASE_URL=... perturber
+```
+
+## Development
+
+```bash
+pip install -e '.[dev,llm]'
+ruff check perturber
+```
 
 ## License
 
-All source files must include a Copyright and License header. The SPDX license header is 
-preferred because it can be easily scanned.
-
-If you would like to see the detailed LICENSE click [here](LICENSE).
-
-```text
-#
-# Copyright IBM Corp. {Year project was created} - {Current Year}
-# SPDX-License-Identifier: Apache-2.0
-#
-```
-## Authors
-
-Optionally, you may include a list of authors, though this is redundant with the built-in
-GitHub list of contributors.
-
-- Author: New OpenSource IBMer <new-opensource-ibmer@ibm.com>
-
-[issues]: https://github.com/IBM/repo-template/issues/new
+Apache-2.0. See `LICENSE`. Contributions are governed by `CONTRIBUTING.md`.
