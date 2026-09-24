@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Registry of perturbations.
 
 Every perturbation is registered under a unique name together with metadata describing

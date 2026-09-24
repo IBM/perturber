@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """FastAPI application.
 
 Every registered perturbation gets its own explicit, typed endpoint, generated from the

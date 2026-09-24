@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Model-backed perturbations (native tier), served via a generic OpenAI-compatible endpoint.
 
 These are perturbations that require a language model rather than a deterministic string

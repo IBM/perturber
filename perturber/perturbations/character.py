@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Character / orthographic perturbations (native tier).
 
 Clean-room, standard-library-only transforms that operate on characters: homoglyph and

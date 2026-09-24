@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Native tier perturbations (commercial-safe, permissively licensed).
 
 This package holds clean-room perturbation implementations plus the ``baseline`` control.

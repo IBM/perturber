@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Word-level perturbations (native tier).
 
 Clean-room, standard-library-only implementations of the word-level perturbation

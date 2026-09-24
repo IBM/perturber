@@ -1,3 +1,9 @@
+/*
+ * Copyright IBM Corp. 2026
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 const $ = (id) => document.getElementById(id);
 
 // --- Theme: dark (default) / light, persisted; first visit follows the OS preference. ---

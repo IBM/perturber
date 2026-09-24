@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Text-normalization perturbations (native tier).
 
 Standard-library-only transforms that renormalise surface conventions while preserving meaning:

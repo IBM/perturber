@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """JSON Schema perturbations (native tier).
 
 Perturbations whose input is a JSON Schema, the exact value a caller puts in a chat-completions

@@ -1,4 +1,9 @@
 # syntax=docker/dockerfile:1
+
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 FROM python:3.12-slim AS builder
 
 LABEL description="perturber: semantics-preserving text perturbations"

@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """The single perturbation primitive.
 
 ``perturb`` applies exactly one named perturbation to one string. Composition of several

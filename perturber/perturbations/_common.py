@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Shared helpers for the native perturbation modules.
 
 Centralizes the small pieces that several perturbation modules would otherwise duplicate: the

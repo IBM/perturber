@@ -70,7 +70,7 @@ Each source file must include a license header for the Apache Software License 2
 SPDX format is the simplest approach, e.g.
 
 ```
-# Copyright <holder> All Rights Reserved.
+# Copyright IBM Corp. 2026
 #
 # SPDX-License-Identifier: Apache-2.0
 ```

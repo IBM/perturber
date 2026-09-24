@@ -1,3 +1,7 @@
+# Copyright IBM Corp. 2026
+#
+# SPDX-License-Identifier: Apache-2.0
+
 """Formatting / whitespace perturbations (native tier).
 
 Standard-library-only transforms that change the text's layout rather than its words:
